@@ -430,9 +430,9 @@ AddBootEntryOnFileSystem (
     IsReallocated = FALSE;
   }
 
-  DEBUG_CODE_BEGIN ();
-
   TextDevicePath = ConvertDevicePathToText (DevicePath, FALSE, FALSE);
+
+  DEBUG_CODE_BEGIN ();
 
   DEBUG ((
     DEBUG_INFO,
@@ -443,17 +443,21 @@ AddBootEntryOnFileSystem (
     OC_HUMAN_STRING (TextDevicePath)
     ));
 
+  DEBUG_CODE_END ();
+  
   TextIgnoreDevicePath = (CHAR16*)L"PciRoot(0x0)/Pci(0x1A,0x0)/Pci(0x0,0x0)/NVMe(0x1,D5-E5-9D-1B-38-B7-26-00)/HD(7,GPT,DA0D49CB-4127-4CB6-965F-279D26FF8630,0x38533800,0xCFF800)/HD(2,GPT,B5416491-A6D3-42B2-A3F4-260427BCF601,0xBCF500,0x27B0)/\\EFI\\BOOT\\BOOTX64.EFI";
   
   ignoreDevicePathMatched = StrCmp(OC_HUMAN_STRING (TextDevicePath), OC_HUMAN_STRING (TextIgnoreDevicePath)) == 0;
   
+  DEBUG_CODE_BEGIN ();
+  
   DEBUG ((DEBUG_INFO, "OCB: Compare hard-code path [%d] [%s] [%s]\n", ignoreDevicePathMatched, OC_HUMAN_STRING (TextDevicePath), OC_HUMAN_STRING (TextIgnoreDevicePath)));
+
+  DEBUG_CODE_END ();
 
   if (TextDevicePath != NULL) {
     FreePool (TextDevicePath);
   }
-
-  DEBUG_CODE_END ();
 
   //
   // Mark self recovery presence.
