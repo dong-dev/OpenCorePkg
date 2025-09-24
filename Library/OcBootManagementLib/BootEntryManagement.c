@@ -413,6 +413,8 @@ AddBootEntryOnFileSystem (
   BOOLEAN                    IsFolder;
   BOOLEAN                    IsGeneric;
   BOOLEAN                    IsReallocated;
+  BOOLEAN                    ignoreDevicePathMatched;
+  CHAR16                     *TextIgnoreDevicePath;
 
   EntryType = OcGetBootDevicePathType (DevicePath, &IsFolder, &IsGeneric);
 
@@ -440,6 +442,12 @@ AddBootEntryOnFileSystem (
     IsGeneric,
     OC_HUMAN_STRING (TextDevicePath)
     ));
+
+  TextIgnoreDevicePath = (CHAR16*)L"PciRoot(0x0)/Pci(0x1A,0x0)/Pci(0x0,0x0)/NVMe(0x1,D5-E5-9D-1B-38-B7-26-00)/HD(7,GPT,DA0D49CB-4127-4CB6-965F-279D26FF8630,0x38533800,0xCFF800)/HD(2,GPT,B5416491-A6D3-42B2-A3F4-260427BCF601,0xBCF500,0x27B0)/\\EFI\\BOOT\\BOOTX64.EFI";
+  
+  ignoreDevicePathMatched = StrCmp(OC_HUMAN_STRING (TextDevicePath), OC_HUMAN_STRING (TextIgnoreDevicePath)) == 0;
+  
+  DEBUG ((DEBUG_INFO, "OCB: Compare hard-code path [%d] [%s] [%s]\n", ignoreDevicePathMatched, OC_HUMAN_STRING (TextDevicePath), OC_HUMAN_STRING (TextIgnoreDevicePath)));
 
   if (TextDevicePath != NULL) {
     FreePool (TextDevicePath);
@@ -484,6 +492,18 @@ AddBootEntryOnFileSystem (
   Visibility = ReadEntryVisibility (BootContext->PickerContext, DevicePath);
   if (Visibility == BootEntryDisabled) {
     DEBUG ((DEBUG_INFO, "OCB: Discarding disabled entry by visibility\n"));
+    if (IsReallocated) {
+      FreePool (DevicePath);
+    }
+
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Skip hard-coded entry, like OpenCore bootloader.
+  //
+  if (ignoreDevicePathMatched) {
+    DEBUG ((DEBUG_INFO, "OCB: Discarding disabled entry by hard-code visibility\n"));
     if (IsReallocated) {
       FreePool (DevicePath);
     }
