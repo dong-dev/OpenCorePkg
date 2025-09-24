@@ -391,7 +391,7 @@ package() {
 
 cd "$(dirname "$0")" || exit 1
 if [ "$ARCHS" = "" ]; then
-  ARCHS=(X64 IA32)
+  ARCHS=(X64)
   export ARCHS
 fi
 SELFPKG=OpenCorePkg
